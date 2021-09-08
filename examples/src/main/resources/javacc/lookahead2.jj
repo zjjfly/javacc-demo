@@ -1,0 +1,104 @@
+options {
+  JAVA_UNICODE_ESCAPE = false;
+  UNICODE_INPUT = true;
+  STATIC = false;
+  COMMON_TOKEN_ACTION = true;
+}
+
+PARSER_BEGIN(LookAhead2)
+package com.siemens.adv.lookahead2.parser;
+import java.io.*;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.net.URISyntaxException;
+    class LookAhead2 {
+        public static void main( String[] args ) throws ParseException, TokenMgrError,URISyntaxException,IOException {
+            URI uri = LookAhead2.class.getClassLoader().getResource("lookahead-input2.txt").toURI();
+            Path path = Paths.get(uri);
+            byte[] bytes = Files.readAllBytes(path);
+            try {
+                Reader reader = new StringReader(new String(bytes,StandardCharsets.UTF_8));
+                LookAhead2 parser = new LookAhead2(reader);
+                System.out.println("basic expr:");
+                parser.basic_expr();
+                parser = new LookAhead2(new StringReader("(id1,id2,id3)\n{id1,id2,3}\n"));
+                System.out.println("==========================");
+                System.out.println("basic expr2:");
+                parser.basic_expr2();
+            } catch (ParseException ex) {
+                System.err.println(ex.getMessage());
+            }
+        }
+    }
+PARSER_END(LookAhead2)
+
+
+TOKEN_MGR_DECLS:
+{
+    //每次匹配到token都会调用这个方法
+    void CommonTokenAction(Token t){
+        System.out.println("image is \""+t.image+"\""+",kind is "+t.kind);
+    }
+}
+
+SKIP : { " "}
+SKIP : { "\n" | "\r" | "\r\n" }
+TOKEN : { < ID : "id" <DIGITS> > }
+TOKEN : {<INT: ("-")? (["1"-"9"]) (["0"-"9"])*>}
+TOKEN : { < DIGITS : (["0"-"9"])+ > }
+
+
+void basic_expr() :
+{
+}
+{
+(
+   <ID> ("(" expr() ")"| "." <ID>) // Choice 1
+|
+    "(" expr() ")"      // Choice 2
+|
+    "new" <ID>          // Choice 3
+ )+
+<EOF>
+}
+
+void expr():
+{
+}
+{
+    <DIGITS>
+}
+
+void basic_expr2() :
+{
+}
+{
+    "("
+    identifier_list()
+    ")"
+    "{"
+    funny_list()
+    "}"
+}
+
+
+void identifier_list() :
+{
+   System.out.println("enter identifier list");
+}
+{
+    <ID> ("," <ID> )*
+    {System.out.println("exit identifier list");}
+}
+
+void funny_list() :
+{
+    System.out.println("enter funny list");
+}
+{
+    <ID> "," (<ID> ",")* <INT>
+    {System.out.println("exit funny list");}
+}

@@ -1,0 +1,98 @@
+
+options {
+  JAVA_UNICODE_ESCAPE = false;
+  UNICODE_INPUT = true;
+  STATIC = false;
+  COMMON_TOKEN_ACTION = true;
+}
+
+PARSER_BEGIN(Lexer)
+package com.siemens.adv.lexer.parser;
+import java.io.*;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.net.URISyntaxException;
+class Lexer{
+    public static void main( String[] args ) throws ParseException, TokenMgrError,URISyntaxException,IOException {
+                URI uri = Lexer.class.getClassLoader().getResource("lexer-input.txt").toURI();
+                Path path = Paths.get(uri);
+                byte[] bytes = Files.readAllBytes(path);
+                try {
+                    Reader reader = new StringReader(new String(bytes,StandardCharsets.UTF_8));
+                    Lexer parser = new Lexer(reader);
+                    parser.Start(System.out);
+                } catch (ParseException ex) {
+                    System.err.println(ex.getMessage());
+                }
+    }
+}
+
+PARSER_END(Lexer)
+
+TOKEN_MGR_DECLS:
+{
+    //每次匹配到token都会调用这个方法
+    void CommonTokenAction(Token t){
+        System.out.println("image is \""+t.image+"\""+",kind is "+t.kind);
+    }
+}
+
+MORE: {
+    <A:("a")+>
+}
+
+TOKEN : {
+    <B: ("b")+>
+    {System.out.println(matchedToken.image+" is matched!");}
+}
+
+SKIP : {
+    <C:("c")+>
+}
+
+SPECIAL_TOKEN : {
+    <D: ("d")+>
+}
+
+TOKEN : {
+    <EOL:   "\n" | "\r" | "\r\n" >
+}
+
+//inline-comment
+<DEFAULT>MORE :{
+ "/*" :WITHINCOMMENT
+}
+
+<WITHINCOMMENT>SPECIAL_TOKEN : {
+ "*/" :DEFAULT
+}
+
+<WITHINCOMMENT>MORE : {
+ <~["\n" , "\r"]>
+}
+
+void Start(PrintStream printStream) throws NumberFormatException :
+{String s;}
+{
+    (
+        s = Expression()
+        <EOL> { printStream.println("expression is "+s) ;}
+    )*
+    <EOF>
+}
+
+String Expression():
+{
+    Token t;
+}{
+    t=<B>
+    {   if (t.specialToken!=null){
+            return t.image+"-"+t.specialToken;
+        }else{
+            return t.image;
+        }
+    }
+}

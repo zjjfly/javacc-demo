@@ -1,0 +1,60 @@
+options {
+  JAVA_UNICODE_ESCAPE = false;
+  UNICODE_INPUT = true;
+  STATIC = false;
+}
+
+PARSER_BEGIN(Adder)
+package com.siemens.adv.adder.parser;
+import java.io.*;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.net.URISyntaxException;
+    class Adder {
+        public static void main( String[] args ) throws ParseException, TokenMgrError,URISyntaxException,IOException {
+            URI uri = Adder.class.getClassLoader().getResource("adder-input.txt").toURI();
+            Path path = Paths.get(uri);
+            byte[] bytes = Files.readAllBytes(path);
+            try {
+                Reader reader = new StringReader(new String(bytes,StandardCharsets.UTF_8));
+                Adder parser = new Adder(reader);
+                int i=parser.Start();
+                System.out.println("result:"+i);
+            } catch (ParseException ex) {
+                System.err.println(ex.getMessage());
+            }
+        }
+    }
+PARSER_END(Adder)
+
+SKIP : { " "}
+SKIP : { "\n" | "\r" | "\r\n" }
+TOKEN : { < PLUS : "+" > }
+TOKEN : { < NUMBER : ("-")? (["0"-"9"])+ > }
+
+int Start() throws NumberFormatException:
+{
+    int i ;
+    int value ;
+}
+{
+    value = Primary()
+    (
+        <PLUS>
+        i = Primary()
+        {value+=i;}
+    )*
+    <EOF>
+    { return value ; }
+}
+
+int Primary() throws NumberFormatException:
+{
+    Token t;
+}{
+    t=<NUMBER>
+    {return Integer.parseInt(t.image);}
+}

@@ -1,0 +1,78 @@
+options {
+  JAVA_UNICODE_ESCAPE = false;
+  UNICODE_INPUT = true;
+  STATIC = false;
+  COMMON_TOKEN_ACTION = true;
+}
+
+PARSER_BEGIN(LookAhead4)
+package com.siemens.adv.lookahead4.parser;
+import java.io.*;
+import java.net.URISyntaxException;
+    class LookAhead4 {
+        public static void main( String[] args ) throws ParseException, TokenMgrError,URISyntaxException,IOException {
+            try {
+                System.out.println("input1:");
+                Reader reader = new StringReader("abc");
+                LookAhead4 parser = new LookAhead4(reader);
+                parser.Input1();
+            } catch (ParseException ex) {
+                System.err.println(ex.getMessage());
+            }
+            System.out.println("input2:");
+            Reader reader = new StringReader("abc");
+            LookAhead4 parser = new LookAhead4(reader);
+            parser.Input2();
+        }
+    }
+PARSER_END(LookAhead4)
+
+
+TOKEN_MGR_DECLS:
+{
+    //每次匹配到token都会调用这个方法
+    void CommonTokenAction(Token t){
+        System.out.println("image is \""+t.image+"\""+",kind is "+t.kind);
+    }
+}
+
+SKIP : { " "}
+SKIP : { "\n" | "\r" | "\r\n" }
+
+void Input1() :
+{}
+{
+  "a" BC() "c"
+  <EOF>
+}
+
+void BC() :
+{}
+{
+  "b" [ "c" ]
+}
+
+void Input2() :
+{}
+{
+  "a" BC2() "c"
+  <EOF>
+}
+
+void BC2() :
+{}
+{
+  "b"
+  [ LOOKAHEAD( { getToken(1).kind == C && getToken(2).kind == C } )
+    <C:"c">
+  ]
+}
+
+void BC3() :
+{}
+{
+  "b"
+  [ LOOKAHEAD( "c", { getToken(2).kind == C } )
+    <C:"c">
+  ]
+}

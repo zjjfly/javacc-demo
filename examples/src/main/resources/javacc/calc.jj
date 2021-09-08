@@ -1,0 +1,129 @@
+/*****************************************
+ * OPTIONS *
+ *****************************************/
+
+options {
+  JAVA_UNICODE_ESCAPE = false;
+  UNICODE_INPUT = true;
+  STATIC = false; //生成的解析器的方法是否是static的,如果是true那么这个parser无法在多线程的情况下使用,所以一般是false
+}
+
+/*****************************************
+ * PARSER JAVA CODE *
+ *****************************************/
+
+PARSER_BEGIN(Calculator) //PARSER_BEGIN到PARSER_END是解析器类的定义,括号中的是生成的解析器的类名
+package com.siemens.adv.calc.parser;
+import java.io.*;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.net.URISyntaxException;
+import java.math.BigDecimal;
+public class Calculator {
+
+    BigDecimal previousValue = new BigDecimal("0.0");
+
+    public static void main( String[] args ) throws ParseException, TokenMgrError,URISyntaxException,IOException {
+        URI uri = Calculator.class.getClassLoader().getResource("calc-input.txt").toURI();
+        Path path = Paths.get(uri);
+        byte[] bytes = Files.readAllBytes(path);
+        try {
+            Reader reader = new StringReader(new String(bytes,StandardCharsets.UTF_8));
+            Calculator parser = new Calculator(reader);
+            parser.Start(System.out);
+        } catch (ParseException ex) {
+            System.err.println(ex.getMessage());
+        }
+    }
+
+}
+PARSER_END(Calculator)
+
+//一些正则表达式,描述那些不需要token manager传给parser的token
+SKIP : { " " }
+//和SKIP相反,描述那些需要token manager传给parser的token
+TOKEN : { < EOL : "\n" | "\r" | "\r\n" > }
+TOKEN : { < PLUS : "+" > }
+TOKEN : { < MINUS : "-" > }
+TOKEN : { < TIMES : "*" > }
+TOKEN : { < DIVIDE : "/" > }
+TOKEN : { < PREVIOUS : "$" > }
+TOKEN : { < OPEN_PAR : "(" > }
+TOKEN : { < CLOSE_PAR : ")" > }
+TOKEN : { < NUMBER : <DIGITS>
+                   | <DIGITS> "." <DIGITS>
+                   | <DIGITS> "."
+                   | "."<DIGITS> >
+        }
+TOKEN : { < #DIGITS : (["0"-"9"])+ > }
+
+//下面的这些是translation grammar
+//对应的BNF表达式:
+//Start --> (Expression EOL) * EOF
+//Expression --> Term (PLUS Term | MINUS Term)*
+//Term --> Primary (TIMES Primary | DIVIDE Primary)*
+//Primary --> NUMBER
+//        | PREVIOUS
+//        | OPEN_PAR Expression CLOSE_PAR
+//        | MINUS Primary
+void Start(PrintStream printStream) throws NumberFormatException :
+{}
+{
+    (
+        previousValue = Expression()
+        <EOL> { printStream.println( previousValue.doubleValue() ) ; }
+    )*
+    <EOF>
+}
+
+BigDecimal Expression():{
+    BigDecimal i ;
+    BigDecimal value ;
+}
+{
+    value = Term()
+    (
+        <PLUS>
+        i = Term()
+        { value = value.add(i); }
+        |<MINUS>
+        i=Term()
+        {value = value.subtract(i);}
+    )*
+    { return value ; }
+}
+
+BigDecimal Term():
+{
+    BigDecimal i ;
+    BigDecimal value ;
+}{
+    value = Primary()
+    (
+        <TIMES>
+        i=Primary()
+        {value=value.multiply(i);}
+        |<DIVIDE>
+        i=Primary()
+        {value=value.divide(i,2,BigDecimal.ROUND_CEILING);}
+    )*
+    { return value; }
+}
+
+BigDecimal Primary():
+{
+    Token t;
+    BigDecimal bg;
+}{
+    t=<NUMBER>
+    {return new BigDecimal(t.image);}
+    |t=<PREVIOUS>
+    {return previousValue;}
+    | <OPEN_PAR> bg=Expression() <CLOSE_PAR>
+    {return bg;}
+    | <MINUS> bg= Primary()
+    {return bg.multiply(BigDecimal.valueOf(-1));}
+}

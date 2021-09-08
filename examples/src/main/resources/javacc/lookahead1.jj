@@ -1,0 +1,87 @@
+options {
+  JAVA_UNICODE_ESCAPE = false;
+  UNICODE_INPUT = true;
+  STATIC = false;
+  COMMON_TOKEN_ACTION = true;
+}
+
+PARSER_BEGIN(LookAhead1)
+package com.siemens.adv.lookahead1.parser;
+import java.io.*;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.net.URISyntaxException;
+    class LookAhead1 {
+        public static void main( String[] args ) throws ParseException, TokenMgrError,URISyntaxException,IOException {
+            URI uri = LookAhead1.class.getClassLoader().getResource("lookahead-input1.txt").toURI();
+            Path path = Paths.get(uri);
+            byte[] bytes = Files.readAllBytes(path);
+            try {
+                Reader reader = new StringReader(new String(bytes,StandardCharsets.UTF_8));
+                LookAhead1 parser = new LookAhead1(reader);
+                parser.basic_expr();
+            } catch (ParseException ex) {
+                System.err.println(ex.getMessage());
+            }
+        }
+    }
+PARSER_END(LookAhead1)
+
+
+TOKEN_MGR_DECLS:
+{
+    //每次匹配到token都会调用这个方法
+    void CommonTokenAction(Token t){
+        System.out.println("image is \""+t.image+"\""+",kind is "+t.kind);
+    }
+}
+
+SKIP : { " "}
+SKIP : { "\n" | "\r" | "\r\n" }
+TOKEN : { < ID : "id" <DIGITS> > }
+TOKEN : { < DIGITS : (["0"-"9"])+ > }
+TOKEN : {<INT: ("-")? (["1"-"9"]) (["0"-"9"])*>}
+
+
+void basic_expr() :
+{
+}
+{
+(
+   <ID> "(" expr() ")" // Choice 1
+|
+    "(" expr() ")"      // Choice 2
+|
+    "new" <ID>          // Choice 3
+|
+   <ID> "." <ID>       // Choice 4
+ )+
+<EOF>
+}
+
+void expr():
+{
+}
+{
+    <DIGITS>
+}
+
+
+void identifier_list() :
+{
+   System.out.println("enter identifier list");
+}
+{
+    <ID> ("," <ID> )*
+}
+
+void funny_list() :
+{
+   System.out.println("enter funny list");
+}
+{
+  identifier_list() "," <INT>
+}
