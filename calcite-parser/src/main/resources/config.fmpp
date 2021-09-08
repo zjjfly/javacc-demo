@@ -35,13 +35,13 @@
 data: {
   parser: {
     # Generated parser implementation package and class name.
-    package: "com.siemens.calcite.sql.parser.impl",
+    package: "com.github.zjjfly.sql.parser.impl",
     class: "MySqlParserImpl",
 
     # List of additional classes and packages to import.
     # Example. "org.apache.calcite.sql.*", "java.util.List".
     imports: [
-        "com.siemens.calcite.sql.func.*"
+        "com.github.zjjfly.sql.func.*"
         "org.apache.calcite.sql.SqlCreate"
     ]
 

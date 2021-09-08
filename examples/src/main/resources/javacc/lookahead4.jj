@@ -6,7 +6,7 @@ options {
 }
 
 PARSER_BEGIN(LookAhead4)
-package com.siemens.adv.lookahead4.parser;
+package com.github.zjjfly.lookahead4.parser;
 import java.io.*;
 import java.net.URISyntaxException;
     class LookAhead4 {
@@ -63,8 +63,8 @@ void BC2() :
 {}
 {
   "b"
-  [ LOOKAHEAD( { getToken(1).kind == C && getToken(2).kind == C } )
-    <C:"c">
+  [ LOOKAHEAD( { getToken(1).kind == C1 && getToken(2).kind == C1 } )
+    <C1:"c">
   ]
 }
 
@@ -72,7 +72,7 @@ void BC3() :
 {}
 {
   "b"
-  [ LOOKAHEAD( "c", { getToken(2).kind == C } )
-    <C:"c">
+  [ LOOKAHEAD( "c", { getToken(2).kind == C2 } )
+    <C2:"c">
   ]
 }

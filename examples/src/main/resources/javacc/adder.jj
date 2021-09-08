@@ -5,7 +5,7 @@ options {
 }
 
 PARSER_BEGIN(Adder)
-package com.siemens.adv.adder.parser;
+package com.github.zjjfly.adder.parser;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;

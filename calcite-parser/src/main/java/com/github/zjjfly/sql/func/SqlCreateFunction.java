@@ -1,4 +1,4 @@
-package com.siemens.calcite.sql.func;
+package com.github.zjjfly.sql.func;
 
 import org.apache.calcite.sql.SqlCreate;
 import org.apache.calcite.sql.SqlIdentifier;

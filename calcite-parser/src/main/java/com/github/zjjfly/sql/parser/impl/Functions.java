@@ -1,4 +1,4 @@
-package com.siemens.calcite.sql.parser.impl;
+package com.github.zjjfly.sql.parser.impl;
 
 import com.google.common.collect.Lists;
 import org.apache.calcite.sql.SqlFunction;

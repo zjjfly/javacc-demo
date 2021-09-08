@@ -1,8 +1,8 @@
 package org.apache.calcite;
 
-import com.siemens.calcite.sql.parser.impl.Functions;
-import com.siemens.calcite.sql.parser.impl.SquareFunction;
-import com.siemens.calcite.sql.parser.impl.TypeUtils;
+import com.github.calcite.sql.parser.impl.Functions;
+import com.github.calcite.sql.parser.impl.SquareFunction;
+import com.github.calcite.sql.parser.impl.TypeUtils;
 import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.config.CalciteConnectionConfigImpl;
 import org.apache.calcite.config.CalciteConnectionProperty;

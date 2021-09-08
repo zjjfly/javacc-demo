@@ -6,7 +6,7 @@ options {
 }
 
 PARSER_BEGIN(LookAhead2)
-package com.siemens.adv.lookahead2.parser;
+package com.github.zjjfly.lookahead2.parser;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;

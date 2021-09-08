@@ -7,7 +7,7 @@ options {
 }
 
 PARSER_BEGIN(Lexer)
-package com.siemens.adv.lexer.parser;
+package com.github.zjjfly.lexer.parser;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;

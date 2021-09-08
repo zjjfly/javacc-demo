@@ -1,4 +1,4 @@
-package com.siemens.calcite.sql.parser.impl;
+package com.github.zjjfly.sql.parser.impl;
 
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeSystem;

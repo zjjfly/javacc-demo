@@ -1,4 +1,4 @@
-package com.siemens.calcite.sql.func;
+package com.github.zjjfly.sql.func;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.calcite.sql.SqlCall;

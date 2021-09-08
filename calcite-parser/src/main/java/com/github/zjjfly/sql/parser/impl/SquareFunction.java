@@ -1,4 +1,4 @@
-package com.siemens.calcite.sql.parser.impl;
+package com.github.zjjfly.sql.parser.impl;
 
 /**
  * @author zjjfly[https://github.com/zjjfly] on 2020/8/20
